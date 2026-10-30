@@ -1,15 +1,20 @@
 import Head from "next/head";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ProjectCard } from "@/components/ProjectCard";
+import { ProjectCard, type ProjectCardData } from "@/components/ProjectCard";
 import { prisma } from "@/lib/prisma";
 
 export async function getStaticProps() {
-  const projects = await prisma.project.findMany();
-  return { props: { projects } };
+  // Select only serializable fields (Date objects can't be passed as props)
+  const projects: ProjectCardData[] = await prisma.project.findMany({
+    where: { published: true },
+    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    select: { id: true, title: true, description: true, thumbnailUrl: true },
+  });
+  return { props: { projects }, revalidate: 60 };
 }
 
-export default function Home({ projects }) {
+export default function Home({ projects }: { projects: ProjectCardData[] }) {
   return (
     <>
       <Head>

@@ -1,13 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
+export interface ProjectCardData {
+  id: number;
+  title: string;
+  description: string;
+  thumbnailUrl: string | null;
+}
+
 interface ProjectCardProps {
-  project: {
-    id: number;
-    title: string;
-    description: string;
-    thumbnailUrl: string;
-  };
+  project: ProjectCardData;
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
