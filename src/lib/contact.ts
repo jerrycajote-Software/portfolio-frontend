@@ -21,3 +21,4 @@ export const contactSchema = z.object({
 });
 
 export type ContactInput = z.input<typeof contactSchema>;
+

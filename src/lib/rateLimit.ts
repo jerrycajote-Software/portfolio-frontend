@@ -33,3 +33,4 @@ export function rateLimit(key: string, limit: number, windowMs: number): { ok: b
 
   return { ok: true, retryAfterSec: 0 };
 }
+
