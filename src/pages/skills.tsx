@@ -69,3 +69,4 @@ export default function Skills({ skills }: { skills: SkillItem[] }) {
     </>
   );
 }
+

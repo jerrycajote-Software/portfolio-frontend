@@ -92,3 +92,4 @@ export default function BlogPostPage({ post }: { post: BlogPostDetail }) {
     </>
   );
 }
+
