@@ -10,17 +10,21 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: [
-          '"Futura PT"',
-          'Futura',
+          'Inter',
           '-apple-system',
           'BlinkMacSystemFont',
           '"Segoe UI"',
           'Roboto',
+          'Helvetica',
+          'Arial',
           'sans-serif',
         ],
-        futura: [
-          '"Futura PT"',
-          'Futura',
+        heading: [
+          'Inter',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
           'sans-serif',
         ],
       },
@@ -70,4 +74,3 @@ module.exports = {
     require('@tailwindcss/forms'),
   ],
 };
-
