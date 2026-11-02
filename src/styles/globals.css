@@ -22,9 +22,12 @@
   }
 
   html {
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  html[data-scroll-behavior="smooth"] {
+    scroll-behavior: smooth;
   }
 
   body {

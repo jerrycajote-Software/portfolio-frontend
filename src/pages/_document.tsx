@@ -16,7 +16,7 @@ export default function Document() {
   `;
 
   return (
-    <Html lang="en" suppressHydrationWarning>
+    <Html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
