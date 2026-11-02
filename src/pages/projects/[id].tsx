@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -20,10 +21,44 @@ const projectSelect = {
   thumbnailUrl: true,
   repoUrl: true,
   liveUrl: true,
+  demoVideos: true,
   tags: { select: { tag: { select: { id: true, name: true } } } },
 } satisfies Prisma.ProjectSelect;
 
 type ProjectDetailData = Prisma.ProjectGetPayload<{ select: typeof projectSelect }>;
+
+export interface DemoVideo {
+  id: string;
+  url: string;
+  title: string;
+  description?: string;
+  sizeBytes?: number;
+  mimeType?: string;
+  durationSeconds?: number;
+}
+
+function getEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes('youtube.com')) {
+      const v = parsed.searchParams.get('v');
+      if (v) return `https://www.youtube-nocookie.com/embed/${v}?rel=0`;
+      if (parsed.pathname.startsWith('/shorts/')) {
+        const id = parsed.pathname.replace('/shorts/', '');
+        if (id) return `https://www.youtube-nocookie.com/embed/${id}?rel=0`;
+      }
+    }
+    if (parsed.hostname.includes('youtu.be')) {
+      const v = parsed.pathname.replace(/^\//, '');
+      if (v) return `https://www.youtube-nocookie.com/embed/${v}?rel=0`;
+    }
+    if (parsed.hostname.includes('vimeo.com')) {
+      const id = parsed.pathname.split('/').filter(Boolean)[0];
+      if (id && /^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}`;
+    }
+  } catch {}
+  return null;
+}
 
 export const getStaticProps: GetStaticProps<{ project: ProjectDetailData }> = async ({ params }) => {
   const id = Number(params?.id);
@@ -38,6 +73,29 @@ export const getStaticProps: GetStaticProps<{ project: ProjectDetailData }> = as
 };
 
 export default function ProjectDetail({ project }: { project: ProjectDetailData }) {
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+
+  let demoVideos: DemoVideo[] = [];
+  if (project.demoVideos) {
+    try {
+      const parsed = JSON.parse(project.demoVideos);
+      if (Array.isArray(parsed)) {
+        demoVideos = parsed;
+      }
+    } catch {}
+  }
+
+  const currentVideo = demoVideos[activeVideoIndex] || demoVideos[0];
+  const embedUrl = currentVideo ? getEmbedUrl(currentVideo.url) : null;
+
+  const formatFileSize = (bytes?: number) => {
+    if (!bytes) return null;
+    if (bytes >= 1024 * 1024 * 1024) {
+      return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+    }
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
   return (
     <>
       <Head>
@@ -120,6 +178,118 @@ export default function ProjectDetail({ project }: { project: ProjectDetailData 
             </a>
           )}
         </div>
+
+        {/* Demo Videos Showcase */}
+        {demoVideos.length > 0 && (
+          <section className="mb-10 p-6 sm:p-8 rounded-3xl bg-slate-900 text-white shadow-2xl border border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <span className="p-2.5 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+                <div>
+                  <h2 className="text-xl font-bold tracking-tight text-white">Project Demo &amp; Walkthroughs</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Interactive preview and high-definition video demonstrations
+                  </p>
+                </div>
+              </div>
+              <span className="self-start sm:self-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-950/80 text-indigo-300 border border-indigo-700/60">
+                {demoVideos.length} {demoVideos.length === 1 ? 'Video' : 'Videos'} Available
+              </span>
+            </div>
+
+            {/* Video Selector Tabs (if more than 1 video) */}
+            {demoVideos.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-5 border-b border-slate-800 scrollbar-thin">
+                {demoVideos.map((vid, idx) => {
+                  const isActive = idx === activeVideoIndex;
+                  return (
+                    <button
+                      key={vid.id || idx}
+                      type="button"
+                      onClick={() => setActiveVideoIndex(idx)}
+                      className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 ${
+                        isActive
+                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                          : 'bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-700/60'
+                      }`}
+                    >
+                      <span>🎬 #{idx + 1}</span>
+                      <span className="truncate max-w-[140px]">{vid.title || `Demo ${idx + 1}`}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Active Video Player Screen */}
+            {currentVideo && (
+              <div className="space-y-4">
+                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-slate-800">
+                  {embedUrl ? (
+                    <iframe
+                      src={embedUrl}
+                      title={currentVideo.title || 'Project Demo Video'}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full border-0"
+                    />
+                  ) : (
+                    <video
+                      key={currentVideo.url}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      className="w-full h-full object-contain bg-black"
+                    >
+                      <source
+                        src={currentVideo.url}
+                        type={currentVideo.mimeType || 'video/mp4'}
+                      />
+                      Your browser does not support HTML5 video playback.
+                    </video>
+                  )}
+                </div>
+
+                {/* Video Info Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60">
+                  <div className="min-w-0">
+                    <h3 className="text-base font-bold text-white truncate">
+                      {currentVideo.title || `Demo Video ${activeVideoIndex + 1}`}
+                    </h3>
+                    {currentVideo.description && (
+                      <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                        {currentVideo.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {currentVideo.sizeBytes && (
+                      <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 text-slate-400 border border-slate-700">
+                        {formatFileSize(currentVideo.sizeBytes)}
+                      </span>
+                    )}
+                    <a
+                      href={currentVideo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 transition-colors flex items-center gap-1.5"
+                    >
+                      <span>Open Video</span>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Project Description */}
         <div className="p-6 sm:p-8 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm leading-relaxed text-slate-700 dark:text-slate-300 text-base sm:text-lg">

@@ -24,9 +24,9 @@ export function Header() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
     { name: 'Skills', href: '/skills' },
     { name: 'Projects', href: '/projects' },
+    { name: 'Certificates', href: '/certificates' },
     { name: 'Blog', href: '/blog' },
     { name: 'Contact', href: '/contact' },
   ];
@@ -45,16 +45,6 @@ export function Header() {
       }`}
     >
       <nav className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6">
-        {/* Brand Name Logo */}
-        <Link href="/" className="group flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            JC
-          </div>
-          <span className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-800 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent group-hover:opacity-90 transition-opacity">
-            Jerry Cajote
-          </span>
-        </Link>
-
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
           {navLinks.map((link) => {
@@ -79,7 +69,7 @@ export function Header() {
         </div>
 
         {/* Right side: Dark Mode Toggle & Mobile Menu Button */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto md:ml-0">
           {/* Night / Light Mode Switch (Pure CSS toggle - zero hydration mismatch) */}
           <button
             type="button"
