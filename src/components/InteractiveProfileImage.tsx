@@ -8,7 +8,7 @@ interface InteractiveProfileImageProps {
 }
 
 export function InteractiveProfileImage({
-  imageSrc = '/my_picture.jpg',
+  imageSrc = '/my_picture.jfif',
   altText = 'Jerry Cajote',
   className = '',
   sizeClassName = 'w-32 h-32 sm:w-36 sm:h-36 md:w-44 md:h-44',

@@ -100,7 +100,7 @@ export default function Home({
           <div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 sm:gap-8 md:gap-10 reveal-item is-revealed">
             {/* Left: Square Profile Picture (Cropped to Face) */}
             <InteractiveProfileImage
-              imageSrc="/my_picture.jpg"
+              imageSrc="/my_picture.jfif"
               altText={`${profileName} - ${profileRole}`}
             />
 

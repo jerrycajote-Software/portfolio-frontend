@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { TechIcon } from '@/components/TechIcon';
 import { prisma } from '@/lib/prisma';
 
 interface SkillItem {
@@ -70,11 +71,16 @@ export default function Skills({ skills }: { skills: SkillItem[] }) {
                 <ul className="space-y-4">
                   {grouped[category].map((skill) => (
                     <li key={skill.id} className="group">
-                      <div className="flex justify-between text-sm font-medium mb-1.5">
-                        <span className="text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                          {skill.name}
-                        </span>
-                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                      <div className="flex justify-between items-center text-sm font-medium mb-1.5">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="w-6 h-6 flex items-center justify-center shrink-0">
+                            <TechIcon name={skill.name} icon={skill.icon} className="w-5 h-5" />
+                          </span>
+                          <span className="text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                            {skill.name}
+                          </span>
+                        </div>
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-2 shrink-0">
                           {skill.level}%
                         </span>
                       </div>

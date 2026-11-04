@@ -1,9 +1,4 @@
-// Minimal in-memory sliding-window rate limiter.
-//
-// LIMITATION: state lives in one server instance's memory. On serverless hosts
-// (Vercel) each instance has its own counter, so this only slows down casual
-// abuse. For stronger protection use a shared store (e.g. Upstash Redis) or
-// Vercel's WAF rate limiting.
+
 
 const hits = new Map<string, number[]>();
 const MAX_KEYS = 5000; // hard cap so the map can't grow without bound

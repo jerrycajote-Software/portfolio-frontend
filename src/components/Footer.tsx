@@ -6,8 +6,12 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
-              JC
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-md shrink-0 bg-slate-100 dark:bg-slate-800">
+              <img
+                src="/profile.jpg"
+                alt="Jerry Cajote"
+                className="w-full h-full object-cover object-[center_15%]"
+              />
             </div>
             <div>
               <p className="font-semibold text-slate-900 dark:text-white">Jerry Cajote</p>
