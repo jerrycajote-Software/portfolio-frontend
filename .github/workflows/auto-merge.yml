@@ -1,0 +1,32 @@
+name: Auto Merge test_update to main
+
+on:
+  push:
+    branches:
+      - test_update
+
+permissions:
+  contents: write
+
+jobs:
+  merge-to-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge test_update into main
+        run: |
+          git checkout main
+          git pull origin main
+          git merge --ff-only test_update || git merge --no-ff test_update -m "chore: auto-merge test_update into main [skip ci]"
+          git push origin main
+
